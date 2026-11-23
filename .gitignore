@@ -1,0 +1,19 @@
+# Glazier local working files
+
+# Downloaded third-party helper tools (e.g. SetUserFTA) are fetched at runtime.
+tools/
+!tools/.gitkeep
+
+# Local run logs
+logs/
+*.log
+
+# Local overrides of the config (keep the committed glazier.yaml as the template)
+glazier.local.yaml
+
+# OS / editor noise
+Thumbs.db
+desktop.ini
+.vs/
+.idea/
+*.user

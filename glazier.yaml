@@ -1,0 +1,204 @@
+# =============================================================================
+# Glazier configuration
+# =============================================================================
+# Every section below is a feature flag. Set `Enabled: false` on any section to
+# skip it entirely, or toggle the individual options inside. Glazier is
+# idempotent: running it repeatedly only applies what is missing, so it is safe
+# to flip a flag and re-run.
+#
+# To customise without editing this committed template, copy it to
+# `glazier.local.yaml` (gitignored) and run:  .\Install.ps1 -ConfigPath .\glazier.local.yaml
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Applications installed via WinGet
+# -----------------------------------------------------------------------------
+Applications:
+  Enabled: true
+
+  # Package agreements are auto-accepted and installs run silently.
+  # `Id` is the WinGet package identifier; `Source` defaults to "winget".
+  Packages:
+    - Id: Fork.Fork                                  # Fork (Git client)
+    - Id: Docker.DockerDesktop                       # Docker Desktop
+    - Id: OBSProject.OBSStudio                       # OBS Studio
+    - Id: JetBrains.Rider                            # JetBrains Rider
+    - Id: Mozilla.Firefox                            # Firefox
+    - Id: Bitwarden.Bitwarden                        # Bitwarden
+    - Id: ZedIndustries.Zed                          # Zed
+    - Id: Discord.Discord                            # Discord
+    - Id: Microsoft.PowerToys                        # PowerToys
+    - Id: Microsoft.PowerShell                       # PowerShell 7
+    - Id: Microsoft.VisualStudioCode                 # VS Code
+    - Id: DBBrowserForSQLite.DBBrowserForSQLite      # DB Browser for SQLite
+    - Id: WinSCP.WinSCP                              # WinSCP
+    - Id: x64dbg.x64dbg                              # x64dbg
+    - Id: VideoLAN.VLC                               # VLC
+    - Id: M2Team.NanaZip                             # NanaZip
+    - Id: MHNexus.HxD                                # HxD hex editor
+    - Id: ShareX.ShareX                             # ShareX
+
+  # Common runtime redistributables used by games.
+  GamingRedistributables:
+    Enabled: true
+    Packages:
+      - Id: Microsoft.DirectX
+      - Id: Microsoft.VCRedist.2015+.x64
+      - Id: Microsoft.VCRedist.2015+.x86
+      - Id: Microsoft.VCRedist.2013.x64
+      - Id: Microsoft.VCRedist.2013.x86
+      - Id: Microsoft.VCRedist.2012.x64
+      - Id: Microsoft.VCRedist.2012.x86
+      - Id: Microsoft.VCRedist.2010.x64
+      - Id: Microsoft.VCRedist.2010.x86
+      - Id: Microsoft.VCRedist.2008.x64
+      - Id: Microsoft.VCRedist.2008.x86
+      - Id: Microsoft.XNARedist
+
+  # NVIDIA App. The unified "NVIDIA App" is distributed through the Microsoft
+  # Store source only.  Mode: Auto   -> install only when an NVIDIA GPU is found
+  #                     Always -> always install
+  #                     Never  -> skip
+  NvidiaApp:
+    Mode: Auto
+    Id: XP8CLZL93F5Z4P
+    Source: msstore        # WinGet source name - literal, not PascalCased
+
+# -----------------------------------------------------------------------------
+# Windows optional features & services
+# -----------------------------------------------------------------------------
+WindowsFeatures:
+  Enabled: true
+  Sandbox: true          # Windows Sandbox (Containers-DisposableClientVM)
+  RemoteDesktop: true    # Enable RDP + firewall rules
+  OpenSshServer: true    # Install & start OpenSSH Server, set to auto-start
+
+# -----------------------------------------------------------------------------
+# Taskbar
+# -----------------------------------------------------------------------------
+Taskbar:
+  Enabled: true
+  Alignment: Left        # Left | Center
+  RemoveSearch: true
+  RemoveCopilotButton: true
+  RemoveTaskView: true
+  RemoveWidgets: true
+
+  # Taskbar pins are applied via a per-user LayoutModification.xml. On Windows 11
+  # these take effect at the next sign-in (see README for the limitation).
+  Pins:
+    Enabled: true
+    Apps:
+      - Explorer
+      - Bitwarden
+      - Fork
+      - Discord
+      - Zed
+
+# -----------------------------------------------------------------------------
+# File Explorer
+# -----------------------------------------------------------------------------
+Explorer:
+  Enabled: true
+  ShowHiddenFiles: true
+  ShowSystemFiles: true
+  ShowFileExtensions: true
+  PinHomeToQuickAccess: true   # Pin %USERPROFILE% to Quick Access
+
+# -----------------------------------------------------------------------------
+# Copilot removal
+# -----------------------------------------------------------------------------
+Copilot:
+  Enabled: true
+  DisablePolicy: true          # TurnOffWindowsCopilot policy (user + machine)
+  RemoveAppxPackage: true      # Best-effort uninstall of the Copilot app
+
+# -----------------------------------------------------------------------------
+# Default applications
+# -----------------------------------------------------------------------------
+# Windows 11 protects the default-apps choice with a per-user hash that scripts
+# cannot write directly. Glazier uses SetUserFTA (a small third-party helper) to
+# set these. Downloading it is opt-in via UseSetUserFTA below.
+Defaults:
+  Enabled: true
+
+  # SetUserFTA download (https://kolbi.cz/). Fetched once into tools/ and reused.
+  UseSetUserFTA: true
+  SetUserFtaUrl: https://kolbi.cz/SetUserFTA.zip
+
+  Browser:
+    Enabled: true
+    Name: Firefox          # Used to locate the app's registered Capabilities.
+
+  ArchiveTool:
+    Enabled: true
+    Name: NanaZip
+    # Extensions to associate with NanaZip. "all supported archives":
+    Extensions:
+      - .7z
+      - .zip
+      - .rar
+      - .tar
+      - .gz
+      - .tgz
+      - .bz2
+      - .tbz
+      - .xz
+      - .txz
+      - .zst
+      - .lz
+      - .lzma
+      - .lzh
+      - .arj
+      - .cab
+      - .iso
+      - .wim
+      - .z
+      - .cpio
+      - .rpm
+      - .deb
+      - '.001'            # quoted so YAML keeps it a string, not the float 0.001
+
+  TerminalShell:
+    Enabled: true
+    Shell: PowerShell7     # Sets the Windows Terminal default profile.
+
+# -----------------------------------------------------------------------------
+# Theme / appearance
+# -----------------------------------------------------------------------------
+Theme:
+  Enabled: true
+  Mode: Dark               # Dark | Light
+  Background: SolidBlack   # SolidBlack | None
+
+# -----------------------------------------------------------------------------
+# Network shares
+# -----------------------------------------------------------------------------
+NetworkShares:
+  Enabled: true
+  Shares:
+    - Path: \\server\Data
+      DriveLetter: ""      # Optional, e.g. "Z". Empty = connect without a letter.
+      Persistent: true
+      PromptForPassword: true
+      # Username: ""       # Optional. If omitted you will be prompted.
+
+# -----------------------------------------------------------------------------
+# .NET
+# -----------------------------------------------------------------------------
+DotNet:
+  Enabled: true
+  Sdks:                    # Installs Microsoft.DotNet.SDK.<version> for each.
+    - 11
+    - 10
+    - 9
+  EfTools: true            # dotnet tool install --global dotnet-ef
+
+# -----------------------------------------------------------------------------
+# Fork (Git client) settings
+# -----------------------------------------------------------------------------
+Fork:
+  Enabled: true
+  # RepositoryHome: Auto -> D:\Repositories if D: exists, else C:\Repositories
+  RepositoryHome: Auto
+  CreateDirectory: true
